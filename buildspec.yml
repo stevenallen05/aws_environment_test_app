@@ -1,0 +1,36 @@
+version: 0.1
+
+phases:
+  pre_build:
+    commands:
+      - cat /etc/lsb-release
+      - echo Installing Ruby...
+      - apt-get -qq update; apt-get -qq install -y software-properties-common; apt-add-repository -y ppa:brightbox/ruby-ng
+      - apt-get -qq update; apt-get -qq install -y ruby2.3
+      - echo Logging in to Amazon ECR...
+      - $(aws ecr get-login --region $AWS_REGION)
+      - export FINAL_DOCKER_IMAGE=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_REPO_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION
+      - export DOCKER_REPO=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_REPO_NAME
+      - export BASE_DOCKER_REPO=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$BASE_IMAGE_REPO_NAME
+      # - sh build_base.sh
+  build:
+    commands:
+      - echo Build started on `date`
+      - echo Building the Docker image...
+      - docker build -t $IMAGE_REPO_NAME -f $DOCKERFILE .
+      # Instead of building pull the previous image
+      # - then docker pull $DOCKER_REPO:$IMAGE_TAG .
+      # - docker build --cache-from $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG -t $IMAGE_REPO_NAME -f $DOCKERFILE .
+      - docker tag $IMAGE_REPO_NAME:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
+      - docker tag $IMAGE_REPO_NAME:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_REPO_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION
+      - echo Figure out where I put the thing
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Pushing the Docker image...
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_REPO_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION
+      - erb docker_repo=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_REPO_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION docker_support/Dockerrun.aws.json.erb > Dockerrun.aws.json
+artifacts:
+  files:
+    - Dockerrun.aws.json
