@@ -1,0 +1,19 @@
+{
+  "AWSEBDockerrunVersion": "1",
+  "Image": {
+    "Name": "<%= docker_repo %>",
+    "Update": "true"
+  },
+  "Ports": [
+    {
+      "ContainerPort": "3000"
+    }
+  ],
+  "Volumes": [
+    {
+      "HostDirectory": "/var/log/rails",
+      "ContainerDirectory": "/app/log"
+    }
+  ],
+  "Logging": "/var/log/rails"
+}
