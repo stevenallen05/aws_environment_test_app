@@ -25,6 +25,7 @@ gem 'sdoc', '~> 0.4.0', group: :doc
 gem 'elasticsearch-model'
 gem 'elasticsearch-rails'
 gem 'okcomputer'
+gem 'puma'
 gem 'sidekiq'
 gem 'sidekiq-cron'
 

@@ -97,6 +97,7 @@ GEM
     nokogiri (1.7.1)
       mini_portile2 (~> 2.1.0)
     okcomputer (1.14.2)
+    puma (3.8.2)
     rack (1.6.5)
     rack-protection (1.5.3)
       rack
@@ -186,6 +187,7 @@ DEPENDENCIES
   jquery-rails
   mysql2 (>= 0.3.13, < 0.5)
   okcomputer
+  puma
   rails (= 4.2.6)
   sass-rails (~> 5.0)
   sdoc (~> 0.4.0)

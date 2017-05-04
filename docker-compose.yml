@@ -1,0 +1,81 @@
+version: '2'
+services:
+
+  db_setup:
+    image: "environment_test"
+    links:
+     - redis
+     - database
+     - elasticsearch
+    environment:
+     - DB_HOST=database
+     - DB_USER=root
+     - DB_PASS=password
+     - DB_SCHEMA=environment_test
+     - RAILS_ENV=production
+     - ELASTICSEARCH_URL=elasticsearch
+    command: "bundle exec rake db:setup"
+  
+  elasticsearch:
+    image: "elasticsearch:5.1"
+    environment:
+     - transport.host=0.0.0.0
+    ports:
+     - "9300:9300"
+     - "9200:9200"
+
+
+  web:
+    image: "environment_test"
+    ports:
+     - "3000:3000"
+    depends_on:
+     - db_setup
+    links:
+     - redis
+     - database
+     - elasticsearch
+    environment:
+     - REDIS_URL=redis:6379
+     - DB_HOST=database
+     - DB_USER=root
+     - DB_PASS=password
+     - DB_SCHEMA=environment_test
+     - RAILS_ENV=production
+     - ELASTICSEARCH_URL=http://elasticsearch:9200
+     - OUTGOING_IP=184.68.27.118
+     - SECRET_KEY_BASE=3f8251f6af02f5da3f526fb31710b038092e0a2e8c25d10e3994651a1f42544f0cd6c217ab762e2bf8b6c10339040b735125f225d043d05d85a5c55139c99013
+
+  worker_one: &WORKER
+    image: "environment_test"
+    command: bundle exec sidekiq
+    depends_on:
+     - db_setup
+    links:
+     - redis
+     - database
+     - elasticsearch
+    environment:
+     - REDIS_URL=redis:6379
+     - DB_HOST=database
+     - DB_USER=root
+     - DB_PASS=password
+     - DB_SCHEMA=environment_test
+     - RAILS_ENV=production
+     - ELASTICSEARCH_URL=http://elasticsearch:9200
+     - SECRET_KEY_BASE=3f8251f6af02f5da3f526fb31710b038092e0a2e8c25d10e3994651a1f42544f0cd6c217ab762e2bf8b6c10339040b735125f225d043d05d85a5c55139c99013
+
+  redis:
+    image: "redis:alpine"
+    ports:
+    - "6379:6379"
+
+  database:
+    image: "mariadb:10"
+    # ports:
+    #  - "3306:3306"
+    volumes:
+     - ./datadir:/var/lib/mysql
+    environment:
+     - MYSQL_ROOT_PASSWORD=password
+     - MYSQL_DATABASE=environment_test
