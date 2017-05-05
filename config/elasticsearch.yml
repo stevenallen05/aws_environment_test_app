@@ -7,6 +7,11 @@ test:
   <<: *default
 staging:
   <<: *default
+elastic_beanstalk:
+  host: <%= ENV['ELASTICSEARCH_URL'] %>
+  transport_options:
+    request:
+      timeout: !!integer 300
 production:
   host: <%= ENV['ELASTICSEARCH_URL'] %>
   transport_options:
