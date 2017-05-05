@@ -3,11 +3,11 @@ require 'open-uri'
 class OutgoingIpCheck < OkComputer::Check
   def check
     remote_ip = open('http://whatismyip.akamai.com').read
-    if remote_ip == ENV['OUTGOING_IP']
+    if ENV['OUTGOING_IPS'].include? remote_ip
       mark_message "Output IP address is #{remote_ip}"
     else
       mark_failure
-      mark_message "Output IP address is #{remote_ip}, but should be #{ENV['OUTGOING_IP']}"
+      mark_message "Output IP address is #{remote_ip}, but should be in #{ENV['OUTGOING_IPS']}"
     end
   end
 end
