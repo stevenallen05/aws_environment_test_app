@@ -8,7 +8,7 @@ ENV BUILD_PACKAGES="curl-dev build-base" \
 RUN \
   apk --update --upgrade add $BUILD_PACKAGES $RUBY_PACKAGES $DEV_PACKAGES && \
   gem install -N bundler
-  
+
 RUN gem install -N nokogiri -- --use-system-libraries && \
   gem install -N rails --version "$RAILS_VERSION" && \
   echo 'gem: --no-document' >> ~/.gemrc && \
@@ -32,5 +32,5 @@ RUN bundle config --global jobs 8 && bundle install
 
 ADD . /app
 RUN rm -rf .git log tmp Dockerfile docker-compose.yml
-RUN bundle exec rake assets:precompile
-CMD ["bundle", "exec", "rails", "s", "-b", "0.0.0.0"]
+# RUN bundle exec rake assets:precompile
+CMD ["./docker-entrypoint.sh"]
