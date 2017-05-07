@@ -31,6 +31,7 @@ RUN gem install bundler
 RUN bundle config --global jobs 8 && bundle install
 
 ADD . /app
+RUN chmod 755 -R bin/*
 RUN rm -rf .git log tmp Dockerfile docker-compose.yml
 # RUN bundle exec rake assets:precompile
 CMD ["bundle", "exec", "bin/docker"]
