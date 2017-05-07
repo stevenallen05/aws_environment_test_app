@@ -3,5 +3,5 @@ case ENV['ROLE']
 when 'WORKER'
   system("bundle exec sidekiq")
 when 'WEB'
-  system("bundle exec puma")
+  system("bundle exec rails s -b 0.0.0.0")
 end
