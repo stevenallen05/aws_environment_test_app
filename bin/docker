@@ -1,0 +1,7 @@
+#!/usr/bin/env ruby
+case ENV['ROLE']
+when 'WORKER'
+  system("bundle exec sidekiq")
+when 'WEB'
+  system("bundle exec puma")
+end
