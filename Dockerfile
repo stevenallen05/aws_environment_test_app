@@ -33,4 +33,4 @@ RUN bundle config --global jobs 8 && bundle install
 ADD . /app
 RUN rm -rf .git log tmp Dockerfile docker-compose.yml
 # RUN bundle exec rake assets:precompile
-CMD ["/bin/bash", "docker-entrypoint.sh"]
+CMD ["bash", "docker-entrypoint.sh"]
